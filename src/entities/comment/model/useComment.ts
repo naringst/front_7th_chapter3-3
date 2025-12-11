@@ -9,9 +9,6 @@ export const useComment = () => {
   const [comments, setComments] = useState<{ [key: number]: Comment[] }>({})
   const [newComment, setNewComment] = useState<NewComment>({ body: "", postId: null, userId: 1 })
 
-  const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
-  const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
-
   // 댓글 가져오기
   const fetchComments = async (postId: number) => {
     if (comments[postId]) return // 이미 불러온 댓글이 있으면 다시 불러오지 않음
@@ -32,7 +29,6 @@ export const useComment = () => {
         ...prev,
         [data.postId]: [...(prev[data.postId] || []), data],
       }))
-      setShowAddCommentDialog(false)
       setNewComment({ body: "", postId: null, userId: 1 })
     } catch (error) {
       console.error("댓글 추가 오류:", error)
@@ -47,7 +43,6 @@ export const useComment = () => {
         ...prev,
         [data.postId]: prev[data.postId].map((comment: Comment) => (comment.id === data.id ? data : comment)),
       }))
-      setShowEditCommentDialog(false)
     } catch (error) {
       console.error("댓글 업데이트 오류:", error)
     }
@@ -94,9 +89,5 @@ export const useComment = () => {
     updateComment,
     deleteComment,
     likeComment,
-    showAddCommentDialog,
-    showEditCommentDialog,
-    setShowAddCommentDialog,
-    setShowEditCommentDialog,
   }
 }
