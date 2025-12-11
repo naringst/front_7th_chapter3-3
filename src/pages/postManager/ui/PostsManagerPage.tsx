@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Edit2, MessageSquare, Plus, Search, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
+import { Edit2, MessageSquare, Plus, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 import {
   Button,
   Card,
@@ -10,12 +10,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Table,
   TableBody,
   TableCell,
@@ -24,8 +18,6 @@ import {
   TableRow,
 } from "../../../shared/ui"
 import { highlightText } from "../../../shared/ui/highlightText"
-import { useTag } from "../../../entities/tag/model/useTag"
-import { usePostFilters } from "../../../features/post-filters/model/usePostFilters"
 import { usePost } from "../../../entities/post/model/usePost"
 import { User, UserDetail } from "../../../entities/user/model/userTypes"
 
@@ -33,14 +25,19 @@ import { User, UserDetail } from "../../../entities/user/model/userTypes"
 import { usePostAdd, PostAddDialog } from "../../../features/post-add"
 import { usePostEdit, PostEditDialog } from "../../../features/post-edit"
 import { usePostDetail, PostDetailDialog } from "../../../features/post-detail"
+import {
+  usePostFilters,
+  TagSelector,
+  SearchInput,
+  SortBySelector,
+  SortOrderSelector,
+  LimitSelector,
+} from "../../../features/post-filters"
 
 export const PostsManagerPage = () => {
   // Post 필터 관련 훅 (q, skip, limit, sortBy, sortOrder, tag)
   const { q, skip, limit, sortBy, sortOrder, tag, setQ, setSkip, setLimit, setSortBy, setSortOrder, setTag } =
     usePostFilters()
-
-  // 태그 목록 가져오기 (entity/tag에서 관리)
-  const { tags, fetchTags } = useTag()
 
   // Post 데이터 관리 (entity)
   const {
@@ -78,10 +75,6 @@ export const PostsManagerPage = () => {
       console.error("사용자 정보 가져오기 오류:", error)
     }
   }
-
-  useEffect(() => {
-    fetchTags()
-  }, [])
 
   useEffect(() => {
     if (tag) {
@@ -181,58 +174,10 @@ export const PostsManagerPage = () => {
         <div className="flex flex-col gap-4">
           {/* 검색 및 필터 컨트롤 */}
           <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="게시물 검색..."
-                  className="pl-8"
-                  value={q || ""}
-                  onChange={(e) => setQ(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && searchPosts({ q: e.currentTarget.value })}
-                />
-              </div>
-            </div>
-
-            <Select
-              value={tag || ""}
-              onValueChange={(value) => {
-                setTag(value)
-                fetchPostsByTag({ tag: value })
-              }}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="태그 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">모든 태그</SelectItem>
-                {tags.map((t) => (
-                  <SelectItem key={t.url} value={t.slug}>
-                    {t.slug}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="정렬 기준" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">없음</SelectItem>
-                <SelectItem value="id">ID</SelectItem>
-                <SelectItem value="title">제목</SelectItem>
-                <SelectItem value="reactions">반응</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="정렬 순서" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="asc">오름차순</SelectItem>
-                <SelectItem value="desc">내림차순</SelectItem>
-              </SelectContent>
-            </Select>
+            <SearchInput value={q || ""} onChange={setQ} onSearch={() => searchPosts({ q: q || "" })} />
+            <TagSelector value={tag || ""} onChange={setTag} />
+            <SortBySelector value={sortBy} onChange={setSortBy} />
+            <SortOrderSelector value={sortOrder} onChange={setSortOrder} />
           </div>
 
           {/* 게시물 테이블 */}
@@ -240,20 +185,7 @@ export const PostsManagerPage = () => {
 
           {/* 페이지네이션 */}
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span>표시</span>
-              <Select value={limit.toString()} onValueChange={(value) => setLimit(Number(value))}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="10" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="30">30</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>항목</span>
-            </div>
+            <LimitSelector value={limit} onChange={setLimit} />
             <div className="flex gap-2">
               <Button disabled={skip === 0} onClick={() => setSkip(Math.max(0, skip - limit))}>
                 이전
