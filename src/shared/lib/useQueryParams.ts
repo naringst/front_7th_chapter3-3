@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom"
-import { useEffect, useCallback, useState } from "react"
+import { useCallback, useMemo } from "react"
 
 /**
  * URL 쿼리 파라미터를 관리하는 공통 훅 (문자열용)
@@ -8,24 +8,16 @@ export const useQueryParam = (paramName: string, defaultValue: string = ""): [st
   const navigate = useNavigate()
   const location = useLocation()
 
-  // URL에서 초기값 읽기
-  const getValue = useCallback((): string => {
+  // URL에서 값 읽기 (location.search가 변경되면 자동으로 리렌더링됨)
+  const value = useMemo(() => {
     const queryParams = new URLSearchParams(location.search)
     const value = queryParams.get(paramName)
     return value || defaultValue
   }, [paramName, defaultValue, location.search])
 
-  const [value, setValue] = useState<string>(getValue())
-
-  // URL이 변경되면 상태 동기화
-  useEffect(() => {
-    setValue(getValue())
-  }, [location.search, getValue])
-
   // Setter 함수
   const setParam = useCallback(
     (newValue: string) => {
-      setValue(newValue)
       const params = new URLSearchParams(location.search)
       if (newValue && newValue !== defaultValue && newValue !== "") {
         params.set(paramName, String(newValue))
@@ -47,24 +39,16 @@ export const useQueryParamNumber = (paramName: string, defaultValue: number = 0)
   const navigate = useNavigate()
   const location = useLocation()
 
-  // URL에서 초기값 읽기
-  const getValue = useCallback((): number => {
+  // URL에서 값 읽기 (location.search가 변경되면 자동으로 리렌더링됨)
+  const value = useMemo(() => {
     const queryParams = new URLSearchParams(location.search)
     const value = queryParams.get(paramName)
     return value ? parseInt(value) || defaultValue : defaultValue
   }, [paramName, defaultValue, location.search])
 
-  const [value, setValue] = useState<number>(getValue())
-
-  // URL이 변경되면 상태 동기화
-  useEffect(() => {
-    setValue(getValue())
-  }, [location.search, getValue])
-
   // Setter 함수
   const setParam = useCallback(
     (newValue: number) => {
-      setValue(newValue)
       const params = new URLSearchParams(location.search)
       if (newValue !== defaultValue && newValue !== 0) {
         params.set(paramName, String(newValue))
