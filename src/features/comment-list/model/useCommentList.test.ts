@@ -1,4 +1,4 @@
-import { renderHook, act, waitFor } from "@testing-library/react"
+import { renderHook, act, waitFor } from "../../../test/testUtils"
 import { describe, it, expect } from "vitest"
 import { useCommentList } from "./useCommentList"
 

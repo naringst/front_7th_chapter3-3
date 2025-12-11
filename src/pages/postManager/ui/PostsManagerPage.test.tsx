@@ -1,12 +1,7 @@
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor } from "../../../test/testUtils"
 import userEvent from "@testing-library/user-event"
 import { describe, it, expect, beforeEach } from "vitest"
-import { BrowserRouter } from "react-router-dom"
 import { PostsManagerPage } from "./PostsManagerPage"
-
-const renderWithRouter = (ui: React.ReactElement) => {
-  return render(<BrowserRouter>{ui}</BrowserRouter>)
-}
 
 describe("PostsManagerPage", () => {
   beforeEach(() => {
@@ -15,17 +10,17 @@ describe("PostsManagerPage", () => {
 
   describe("Initial Rendering", () => {
     it("renders page title", async () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
       expect(screen.getByText("게시물 관리자")).toBeInTheDocument()
     })
 
     it("renders add post button", async () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
       expect(screen.getByText("게시물 추가")).toBeInTheDocument()
     })
 
     it("loads and displays posts", async () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       await waitFor(() => {
         expect(screen.getByText("Test Post 1")).toBeInTheDocument()
@@ -35,7 +30,7 @@ describe("PostsManagerPage", () => {
     })
 
     it("displays post tags correctly", async () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       // Wait for posts to load first
       await waitFor(
@@ -57,7 +52,7 @@ describe("PostsManagerPage", () => {
     })
 
     it("loads tags into select dropdown", async () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       await waitFor(() => {
         expect(screen.getByText("태그 선택")).toBeInTheDocument()
@@ -67,7 +62,7 @@ describe("PostsManagerPage", () => {
 
   describe("Search Functionality", () => {
     it("renders search input", () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       const searchInput = screen.getByPlaceholderText("게시물 검색...")
       expect(searchInput).toBeInTheDocument()
@@ -75,7 +70,7 @@ describe("PostsManagerPage", () => {
 
     it("updates search input value", async () => {
       const user = userEvent.setup()
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       const searchInput = screen.getByPlaceholderText("게시물 검색...")
       await user.type(searchInput, "test query")
@@ -86,7 +81,7 @@ describe("PostsManagerPage", () => {
 
   describe("Tag Filtering", () => {
     it("renders tag select dropdown", () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       expect(screen.getByText("태그 선택")).toBeInTheDocument()
     })
@@ -95,7 +90,7 @@ describe("PostsManagerPage", () => {
   describe("Post CRUD Operations", () => {
     it("opens add post dialog when clicking add button", async () => {
       const user = userEvent.setup()
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       await user.click(screen.getByText("게시물 추가"))
 
@@ -106,7 +101,7 @@ describe("PostsManagerPage", () => {
 
     it("creates a new post", async () => {
       const user = userEvent.setup()
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       await user.click(screen.getByText("게시물 추가"))
 
@@ -132,7 +127,7 @@ describe("PostsManagerPage", () => {
 
     it("deletes a post", async () => {
       const user = userEvent.setup()
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       await waitFor(
         () => {
@@ -171,7 +166,7 @@ describe("PostsManagerPage", () => {
 
   describe("Pagination", () => {
     it("renders pagination controls", async () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       await waitFor(() => {
         expect(screen.getByText("이전")).toBeInTheDocument()
@@ -180,7 +175,7 @@ describe("PostsManagerPage", () => {
     })
 
     it("disables previous button on first page", async () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       await waitFor(() => {
         const prevButton = screen.getByText("이전")
@@ -191,7 +186,7 @@ describe("PostsManagerPage", () => {
 
   describe("Sorting", () => {
     it("renders sort controls", async () => {
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       // Sort controls should be present immediately
       expect(screen.getByText("없음")).toBeInTheDocument()
@@ -202,7 +197,7 @@ describe("PostsManagerPage", () => {
   describe("Post Detail Dialog", () => {
     it("opens post detail dialog when clicking message icon", async () => {
       const user = userEvent.setup()
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       await waitFor(
         () => {
@@ -239,7 +234,7 @@ describe("PostsManagerPage", () => {
   describe("Edit Post", () => {
     it("opens edit dialog when clicking edit button", async () => {
       const user = userEvent.setup()
-      renderWithRouter(<PostsManagerPage />)
+      render(<PostsManagerPage />)
 
       await waitFor(
         () => {

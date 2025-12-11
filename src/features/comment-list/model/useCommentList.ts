@@ -8,14 +8,12 @@ import type { Comment } from "../../../entities/comment/model/commentTypes"
  */
 export const useCommentList = (postId: number | undefined) => {
   const { comments, newComment, setNewComment, fetchComments, addComment, updateComment, deleteComment, likeComment } =
-    useComment()
+    useComment(postId)
 
   // UI 상태는 feature에서 관리
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
-
-  const postComments = postId ? comments[postId] || [] : []
 
   const handleAddComment = () => {
     if (!postId) return
@@ -40,15 +38,21 @@ export const useCommentList = (postId: number | undefined) => {
     setShowAddCommentDialog(false)
   }
 
+  const handleLikeComment = (id: number, pId: number) => {
+    likeComment(id, pId)
+  }
+
+  const handleDeleteComment = (id: number, pId: number) => {
+    deleteComment(id, pId)
+  }
+
   return {
-    comments: postComments,
-    fetchComments: () => {
-      if (postId) fetchComments(postId)
-    },
+    comments,
+    fetchComments,
     onAddComment: handleAddComment,
-    onLikeComment: likeComment,
+    onLikeComment: handleLikeComment,
     onEditComment: handleEditComment,
-    onDeleteComment: deleteComment,
+    onDeleteComment: handleDeleteComment,
     // Dialog 관련
     showAddCommentDialog,
     showEditCommentDialog,

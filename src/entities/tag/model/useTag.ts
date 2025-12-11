@@ -1,26 +1,11 @@
-import { useEffect, useState } from "react"
-import { fetchTags } from "../api/fetchTags"
-import { Tag } from "./tagType"
+import { useQuery } from "@tanstack/react-query"
+import { tagsQueryOptions } from "../api/tagQueries"
 
 export const useTag = () => {
-  const [tags, setTags] = useState<Tag[]>([])
-
-  // 태그 가져오기
-  const loadTags = async () => {
-    try {
-      const data = await fetchTags()
-      setTags(data)
-    } catch (error) {
-      console.error("태그 가져오기 오류:", error)
-    }
-  }
-
-  useEffect(() => {
-    fetchTags().then(setTags).catch(console.error)
-  }, [])
+  const { data: tags = [], refetch } = useQuery(tagsQueryOptions())
 
   return {
     tags,
-    fetchTags: loadTags,
+    fetchTags: refetch,
   }
 }
