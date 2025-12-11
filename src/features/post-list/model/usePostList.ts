@@ -9,7 +9,7 @@ export const usePostList = () => {
   // 검색어는 로컬 state로 관리, 검색 버튼 클릭 시에만 실제 검색 실행
   const [searchQuery, setSearchQuery] = useState("")
 
-  const { loading, posts, total, addPostToList, updatePostInList, removePostFromList } = usePost({
+  const { loading, posts, total } = usePost({
     limit,
     skip,
     tag: tag || undefined,
@@ -44,8 +44,5 @@ export const usePostList = () => {
     posts,
     total,
     searchPosts,
-    addPostToList,
-    updatePostInList,
-    removePostFromList,
   }
 }

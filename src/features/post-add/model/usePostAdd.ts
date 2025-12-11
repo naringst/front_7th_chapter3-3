@@ -1,14 +1,17 @@
 import { useState } from "react"
-import { addPostAPI } from "../../../entities/post/api/addPostAPI"
-import { NewPost, Post } from "../../../entities/post/model/postTypes"
+import { NewPost } from "../../../entities/post/model/postTypes"
+import { useAddPostMutation } from "../api/postAddMutation"
 
-interface UsePostAddProps {
-  onSuccess: (post: Post) => void
-}
-
-export const usePostAdd = ({ onSuccess }: UsePostAddProps) => {
+export const usePostAdd = () => {
   const [showDialog, setShowDialog] = useState(false)
   const [newPost, setNewPost] = useState<NewPost>({ title: "", body: "", userId: 1 })
+
+  const addPostMutation = useAddPostMutation({
+    onSuccess: () => {
+      setShowDialog(false)
+      setNewPost({ title: "", body: "", userId: 1 })
+    },
+  })
 
   const open = () => setShowDialog(true)
 
@@ -17,14 +20,8 @@ export const usePostAdd = ({ onSuccess }: UsePostAddProps) => {
     setNewPost({ title: "", body: "", userId: 1 })
   }
 
-  const submit = async () => {
-    try {
-      const data = await addPostAPI({ newPost })
-      close()
-      onSuccess(data)
-    } catch (error) {
-      console.error("게시물 추가 오류:", error)
-    }
+  const submit = () => {
+    addPostMutation.mutate(newPost)
   }
 
   return {
@@ -34,5 +31,7 @@ export const usePostAdd = ({ onSuccess }: UsePostAddProps) => {
     open,
     close,
     submit,
+    isLoading: addPostMutation.isPending,
+    error: addPostMutation.error,
   }
 }

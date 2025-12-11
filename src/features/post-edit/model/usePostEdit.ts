@@ -1,16 +1,19 @@
 import { useState } from "react"
-import { updatePostAPI } from "../../../entities/post/api/updatePostAPI"
-import { deletePostAPI } from "../../../entities/post/api/deletePostAPI"
 import { Post } from "../../../entities/post/model/postTypes"
+import { useUpdatePostMutation, useDeletePostMutation } from "../api/postEditMutations"
 
-interface UsePostEditProps {
-  onUpdateSuccess: (post: Post) => void
-  onDeleteSuccess: (id: number) => void
-}
-
-export const usePostEdit = ({ onUpdateSuccess, onDeleteSuccess }: UsePostEditProps) => {
+export const usePostEdit = () => {
   const [showDialog, setShowDialog] = useState(false)
   const [selectedPost, setSelectedPost] = useState<Post | null>(null)
+
+  const updatePostMutation = useUpdatePostMutation({
+    onSuccess: () => {
+      setShowDialog(false)
+      setSelectedPost(null)
+    },
+  })
+
+  const deletePostMutation = useDeletePostMutation()
 
   const open = (post: Post) => {
     setSelectedPost(post)
@@ -22,24 +25,13 @@ export const usePostEdit = ({ onUpdateSuccess, onDeleteSuccess }: UsePostEditPro
     setSelectedPost(null)
   }
 
-  const update = async () => {
+  const update = () => {
     if (!selectedPost) return
-    try {
-      const data = await updatePostAPI({ selectedPost })
-      close()
-      onUpdateSuccess(data)
-    } catch (error) {
-      console.error("게시물 업데이트 오류:", error)
-    }
+    updatePostMutation.mutate(selectedPost)
   }
 
-  const remove = async (id: number) => {
-    try {
-      await deletePostAPI({ id })
-      onDeleteSuccess(id)
-    } catch (error) {
-      console.error("게시물 삭제 오류:", error)
-    }
+  const remove = (id: number) => {
+    deletePostMutation.mutate(id)
   }
 
   return {
@@ -50,5 +42,9 @@ export const usePostEdit = ({ onUpdateSuccess, onDeleteSuccess }: UsePostEditPro
     close,
     update,
     remove,
+    isUpdating: updatePostMutation.isPending,
+    isDeleting: deletePostMutation.isPending,
+    updateError: updatePostMutation.error,
+    deleteError: deletePostMutation.error,
   }
 }

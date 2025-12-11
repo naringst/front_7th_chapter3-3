@@ -30,17 +30,11 @@ export const PostsManagerPage = () => {
     posts,
     total,
     searchPosts,
-    addPostToList,
-    updatePostInList,
-    removePostFromList,
   } = usePostList()
 
   // Features
-  const postAdd = usePostAdd({ onSuccess: addPostToList })
-  const postEdit = usePostEdit({
-    onUpdateSuccess: updatePostInList,
-    onDeleteSuccess: removePostFromList,
-  })
+  const postAdd = usePostAdd()
+  const postEdit = usePostEdit()
   const postDetail = usePostDetail()
   const userDetail = useUserDetail()
 

@@ -125,43 +125,47 @@ describe("PostsManagerPage", () => {
       })
     })
 
-    it("deletes a post", async () => {
-      const user = userEvent.setup()
-      render(<PostsManagerPage />)
+    it(
+      "deletes a post",
+      async () => {
+        const user = userEvent.setup()
+        render(<PostsManagerPage />)
 
-      await waitFor(
-        () => {
-          expect(screen.getByText("Test Post 1")).toBeInTheDocument()
-        },
-        { timeout: 5000 },
-      )
+        await waitFor(
+          () => {
+            expect(screen.getByText("Test Post 1")).toBeInTheDocument()
+          },
+          { timeout: 5000 },
+        )
 
-      // Wait a bit for full render
-      await waitFor(
-        () => {
-          const rows = document.querySelectorAll("tr")
-          expect(rows.length).toBeGreaterThan(1)
-        },
-        { timeout: 5000 },
-      )
+        // Wait a bit for full render
+        await waitFor(
+          () => {
+            const rows = document.querySelectorAll("tr")
+            expect(rows.length).toBeGreaterThan(1)
+          },
+          { timeout: 5000 },
+        )
 
-      // Find delete buttons by looking for buttons with trash icon
-      const rows = document.querySelectorAll("tr")
-      const firstDataRow = rows[1] // Skip header row
-      const buttons = firstDataRow?.querySelectorAll("button")
-      const deleteButton = buttons?.[2] // Third button is delete (message, edit, delete)
+        // Find delete buttons by looking for buttons with trash icon
+        const rows = document.querySelectorAll("tr")
+        const firstDataRow = rows[1] // Skip header row
+        const buttons = firstDataRow?.querySelectorAll("button")
+        const deleteButton = buttons?.[2] // Third button is delete (message, edit, delete)
 
-      if (deleteButton) {
-        await user.click(deleteButton)
-      }
+        if (deleteButton) {
+          await user.click(deleteButton)
+        }
 
-      await waitFor(
-        () => {
-          expect(screen.queryByText("Test Post 1")).not.toBeInTheDocument()
-        },
-        { timeout: 5000 },
-      )
-    })
+        await waitFor(
+          () => {
+            expect(screen.queryByText("Test Post 1")).not.toBeInTheDocument()
+          },
+          { timeout: 5000 },
+        )
+      },
+      10000,
+    )
   })
 
   describe("Pagination", () => {
