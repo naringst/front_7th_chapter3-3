@@ -1,17 +1,13 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { fetchTags } from "../api/fetchTags"
 
 export const useTag = () => {
   const [tags, setTags] = useState([])
 
-  useEffect(() => {
-    fetchTags()
-  }, [])
-
   // 태그 가져오기
-  const fetchTags = async () => {
+  const loadTags = async () => {
     try {
-      const response = await fetch("/api/posts/tags")
-      const data = await response.json()
+      const data = await fetchTags()
       setTags(data)
     } catch (error) {
       console.error("태그 가져오기 오류:", error)
@@ -20,6 +16,6 @@ export const useTag = () => {
 
   return {
     tags,
-    fetchTags,
+    fetchTags: loadTags,
   }
 }
