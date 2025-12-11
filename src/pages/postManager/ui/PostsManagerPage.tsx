@@ -20,13 +20,7 @@ import { usePostEdit, PostEditDialog } from "../../../features/post-edit"
 import { usePostDetail, PostDetailDialog } from "../../../features/post-detail"
 import { usePostList } from "../../../features/post-list"
 import { useUserDetail, UserDetailDialog } from "../../../features/user-detail"
-import {
-  TagSelector,
-  SearchInput,
-  SortBySelector,
-  SortOrderSelector,
-  LimitSelector,
-} from "../../../features/post-filters"
+import { PostFiltersBar, Pagination } from "../../../features/post-filters"
 
 export const PostsManagerPage = () => {
   // Post 목록 (필터 + 데이터)
@@ -150,28 +144,29 @@ export const PostsManagerPage = () => {
       <CardContent>
         <div className="flex flex-col gap-4">
           {/* 검색 및 필터 컨트롤 */}
-          <div className="flex gap-4">
-            <SearchInput value={q || ""} onChange={setQ} onSearch={() => searchPosts({ q: q || "" })} />
-            <TagSelector value={tag || ""} onChange={setTag} />
-            <SortBySelector value={sortBy} onChange={setSortBy} />
-            <SortOrderSelector value={sortOrder} onChange={setSortOrder} />
-          </div>
+          <PostFiltersBar
+            q={q || ""}
+            tag={tag || ""}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onQChange={setQ}
+            onTagChange={setTag}
+            onSortByChange={setSortBy}
+            onSortOrderChange={setSortOrder}
+            onSearch={() => searchPosts({ q: q || "" })}
+          />
 
           {/* 게시물 테이블 */}
           {loading ? <div className="flex justify-center p-4">로딩 중...</div> : renderPostTable()}
 
           {/* 페이지네이션 */}
-          <div className="flex justify-between items-center">
-            <LimitSelector value={limit} onChange={setLimit} />
-            <div className="flex gap-2">
-              <Button disabled={skip === 0} onClick={() => setSkip(Math.max(0, skip - limit))}>
-                이전
-              </Button>
-              <Button disabled={skip + limit >= total} onClick={() => setSkip(skip + limit)}>
-                다음
-              </Button>
-            </div>
-          </div>
+          <Pagination
+            skip={skip}
+            limit={limit}
+            total={total}
+            onSkipChange={setSkip}
+            onLimitChange={setLimit}
+          />
         </div>
       </CardContent>
 
