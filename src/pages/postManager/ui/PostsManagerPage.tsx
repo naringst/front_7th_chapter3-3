@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Edit2, MessageSquare, Plus, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 import {
   Button,
@@ -18,15 +18,14 @@ import {
   TableRow,
 } from "../../../shared/ui"
 import { highlightText } from "../../../shared/ui/highlightText"
-import { usePost } from "../../../entities/post/model/usePost"
 import { User, UserDetail } from "../../../entities/user/model/userTypes"
 
 // Features
 import { usePostAdd, PostAddDialog } from "../../../features/post-add"
 import { usePostEdit, PostEditDialog } from "../../../features/post-edit"
 import { usePostDetail, PostDetailDialog } from "../../../features/post-detail"
+import { usePostList } from "../../../features/post-list"
 import {
-  usePostFilters,
   TagSelector,
   SearchInput,
   SortBySelector,
@@ -35,22 +34,28 @@ import {
 } from "../../../features/post-filters"
 
 export const PostsManagerPage = () => {
-  // Post 필터 관련 훅 (q, skip, limit, sortBy, sortOrder, tag)
-  const { q, skip, limit, sortBy, sortOrder, tag, setQ, setSkip, setLimit, setSortBy, setSortOrder, setTag } =
-    usePostFilters()
-
-  // Post 데이터 관리 (entity)
+  // Post 목록 (필터 + 데이터)
   const {
+    q,
+    skip,
+    limit,
+    sortBy,
+    sortOrder,
+    tag,
+    setQ,
+    setSkip,
+    setLimit,
+    setSortBy,
+    setSortOrder,
+    setTag,
     loading,
     posts,
     total,
-    fetchPosts,
     searchPosts,
-    fetchPostsByTag,
     addPostToList,
     updatePostInList,
     removePostFromList,
-  } = usePost({ limit, skip })
+  } = usePostList()
 
   // Features
   const postAdd = usePostAdd({ onSuccess: addPostToList })
@@ -75,14 +80,6 @@ export const PostsManagerPage = () => {
       console.error("사용자 정보 가져오기 오류:", error)
     }
   }
-
-  useEffect(() => {
-    if (tag) {
-      fetchPostsByTag({ tag })
-    } else {
-      fetchPosts()
-    }
-  }, [skip, limit, sortBy, sortOrder, tag])
 
   // 게시물 테이블 렌더링
   const renderPostTable = () => (
