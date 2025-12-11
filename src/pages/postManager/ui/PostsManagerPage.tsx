@@ -254,7 +254,7 @@ export const PostsManagerPage = () => {
                         setTag(postTag)
                       }}
                     >
-                      {tag}
+                      {postTag}
                     </span>
                   ))}
                 </div>
