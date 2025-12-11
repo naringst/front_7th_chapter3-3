@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { Edit2, MessageSquare, Plus, Search, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
-import { useLocation, useNavigate } from "react-router-dom"
 import {
   Button,
   Card,
@@ -27,15 +26,17 @@ import {
 } from "../../../shared/ui"
 import { highlightText } from "../../../shared/ui/highlightText"
 import { useComment } from "../../../entities/comment/model/useComment"
+import { useTag } from "../../../entities/tag/model/useTag"
+import { usePostFilters } from "../../../features/post-filters/model/usePostFilters"
 
-export interface Author {
+export interface User {
   id: number
   image: string
   username: string
 }
 
 export interface Post {
-  author: Author
+  author: User
   body: string
   reactions: {
     likes: number
@@ -48,25 +49,21 @@ export interface Post {
 }
 
 export const PostsManagerPage = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
+  // Post 필터 관련 훅 (q, skip, limit, sortBy, sortOrder, tag)
+  const { q, skip, limit, sortBy, sortOrder, tag, setQ, setSkip, setLimit, setSortBy, setSortOrder, setTag } =
+    usePostFilters()
+
+  // 태그 목록 가져오기 (entity/tag에서 관리)
+  const { tags, fetchTags } = useTag()
 
   // 상태 관리
   const [posts, setPosts] = useState<Post[]>([])
   const [total, setTotal] = useState(0)
-  const [skip, setSkip] = useState(parseInt(queryParams.get("skip") || "0"))
-  const [limit, setLimit] = useState(parseInt(queryParams.get("limit") || "10"))
-  const [searchQuery, setSearchQuery] = useState(queryParams.get("search") || "")
   const [selectedPost, setSelectedPost] = useState(null)
-  const [sortBy, setSortBy] = useState(queryParams.get("sortBy") || "")
-  const [sortOrder, setSortOrder] = useState(queryParams.get("sortOrder") || "asc")
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [newPost, setNewPost] = useState({ title: "", body: "", userId: 1 })
   const [loading, setLoading] = useState(false)
-  const [tags, setTags] = useState([])
-  const [selectedTag, setSelectedTag] = useState(queryParams.get("tag") || "")
   const [selectedComment, setSelectedComment] = useState(null)
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false)
   const [showUserModal, setShowUserModal] = useState(false)
@@ -87,18 +84,6 @@ export const PostsManagerPage = () => {
     setShowEditCommentDialog,
   } = useComment()
 
-  // URL 업데이트 함수
-  const updateURL = () => {
-    const params = new URLSearchParams()
-    if (skip) params.set("skip", skip.toString())
-    if (limit) params.set("limit", limit.toString())
-    if (searchQuery) params.set("search", searchQuery)
-    if (sortBy) params.set("sortBy", sortBy)
-    if (sortOrder) params.set("sortOrder", sortOrder)
-    if (selectedTag) params.set("tag", selectedTag)
-    navigate(`?${params.toString()}`)
-  }
-
   // 게시물 가져오기
   const fetchPosts = () => {
     setLoading(true)
@@ -114,9 +99,9 @@ export const PostsManagerPage = () => {
       .then((response) => response.json())
       .then((users) => {
         usersData = users.users
-        const postsWithUsers = postsData.posts.map((post) => ({
+        const postsWithUsers = postsData.posts.map((post: Post) => ({
           ...post,
-          author: usersData.find((user) => user.id === post.userId),
+          author: usersData.find((user: User) => user.id === post.userId),
         }))
         setPosts(postsWithUsers)
         setTotal(postsData.total)
@@ -129,26 +114,17 @@ export const PostsManagerPage = () => {
       })
   }
 
-  // 태그 가져오기
-  const fetchTags = async () => {
-    try {
-      const response = await fetch("/api/posts/tags")
-      const data = await response.json()
-      setTags(data)
-    } catch (error) {
-      console.error("태그 가져오기 오류:", error)
-    }
-  }
+  console.log("tags", tags)
 
   // 게시물 검색
   const searchPosts = async () => {
-    if (!searchQuery) {
+    if (!q) {
       fetchPosts()
       return
     }
     setLoading(true)
     try {
-      const response = await fetch(`/api/posts/search?q=${searchQuery}`)
+      const response = await fetch(`/api/posts/search?q=${q}`)
       const data = await response.json()
       setPosts(data.posts)
       setTotal(data.total)
@@ -255,23 +231,12 @@ export const PostsManagerPage = () => {
   }, [])
 
   useEffect(() => {
-    if (selectedTag) {
-      fetchPostsByTag(selectedTag)
+    if (tag) {
+      fetchPostsByTag(tag)
     } else {
       fetchPosts()
     }
-    updateURL()
-  }, [skip, limit, sortBy, sortOrder, selectedTag])
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    setSkip(parseInt(params.get("skip") || "0"))
-    setLimit(parseInt(params.get("limit") || "10"))
-    setSearchQuery(params.get("search") || "")
-    setSortBy(params.get("sortBy") || "")
-    setSortOrder(params.get("sortOrder") || "asc")
-    setSelectedTag(params.get("tag") || "")
-  }, [location.search])
+  }, [skip, limit, sortBy, sortOrder, tag])
 
   // 게시물 테이블 렌더링
   const renderPostTable = () => (
@@ -291,20 +256,19 @@ export const PostsManagerPage = () => {
             <TableCell>{post.id}</TableCell>
             <TableCell>
               <div className="space-y-1">
-                <div>{highlightText(post.title, searchQuery)}</div>
+                <div>{highlightText(post.title, q || "")}</div>
 
                 <div className="flex flex-wrap gap-1">
-                  {post.tags?.map((tag) => (
+                  {post.tags?.map((postTag) => (
                     <span
-                      key={tag}
+                      key={postTag}
                       className={`px-1 text-[9px] font-semibold rounded-[4px] cursor-pointer ${
-                        selectedTag === tag
+                        tag === postTag
                           ? "text-white bg-blue-500 hover:bg-blue-600"
                           : "text-blue-800 bg-blue-100 hover:bg-blue-200"
                       }`}
                       onClick={() => {
-                        setSelectedTag(tag)
-                        updateURL()
+                        setTag(postTag)
                       }}
                     >
                       {tag}
@@ -354,7 +318,7 @@ export const PostsManagerPage = () => {
   )
 
   // 댓글 렌더링
-  const renderComments = (postId) => (
+  const renderComments = (postId: number) => (
     <div className="mt-2">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-semibold">댓글</h3>
@@ -374,7 +338,7 @@ export const PostsManagerPage = () => {
           <div key={comment.id} className="flex items-center justify-between text-sm border-b pb-1">
             <div className="flex items-center space-x-2 overflow-hidden">
               <span className="font-medium truncate">{comment.user.username}:</span>
-              <span className="truncate">{highlightText(comment.body, searchQuery)}</span>
+              <span className="truncate">{highlightText(comment.body, q || "")}</span>
             </div>
             <div className="flex items-center space-x-1">
               <Button variant="ghost" size="sm" onClick={() => likeComment(comment.id, postId)}>
@@ -422,19 +386,18 @@ export const PostsManagerPage = () => {
                 <Input
                   placeholder="게시물 검색..."
                   className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={q || ""}
+                  onChange={(e) => setQ(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && searchPosts()}
                 />
               </div>
             </div>
 
             <Select
-              value={selectedTag}
+              value={tag || ""}
               onValueChange={(value) => {
-                setSelectedTag(value)
+                setTag(value)
                 fetchPostsByTag(value)
-                updateURL()
               }}
             >
               <SelectTrigger className="w-[180px]">
@@ -592,10 +555,10 @@ export const PostsManagerPage = () => {
       <Dialog open={showPostDetailDialog} onOpenChange={setShowPostDetailDialog}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{highlightText(selectedPost?.title, searchQuery)}</DialogTitle>
+            <DialogTitle>{highlightText(selectedPost?.title, q || "")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p>{highlightText(selectedPost?.body, searchQuery)}</p>
+            <p>{highlightText(selectedPost?.body, q || "")}</p>
             {renderComments(selectedPost?.id)}
           </div>
         </DialogContent>
