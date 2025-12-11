@@ -1,8 +1,9 @@
 import { useState } from "react"
 import { fetchTags } from "../api/fetchTags"
+import { Tag } from "./tagType"
 
 export const useTag = () => {
-  const [tags, setTags] = useState([])
+  const [tags, setTags] = useState<Tag[]>([])
 
   // 태그 가져오기
   const loadTags = async () => {
