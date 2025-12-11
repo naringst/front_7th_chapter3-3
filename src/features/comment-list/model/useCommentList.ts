@@ -1,19 +1,36 @@
 import { useState } from "react"
 import { useComment } from "../../../entities/comment/model/useComment"
-import type { Comment } from "../../../entities/comment/model/commentTypes"
+import type { Comment, NewComment } from "../../../entities/comment/model/commentTypes"
+import {
+  useAddCommentMutation,
+  useUpdateCommentMutation,
+  useDeleteCommentMutation,
+  useLikeCommentMutation,
+} from "../api/commentMutations"
 
 /**
  * 댓글 목록 관리 기능
- * entities/comment의 useComment를 사용하여 댓글 목록 관련 로직을 조합
+ * entities/comment의 useComment를 사용하여 댓글 조회
+ * mutations는 features layer에서 직접 처리
  */
 export const useCommentList = (postId: number | undefined) => {
-  const { comments, newComment, setNewComment, fetchComments, addComment, updateComment, deleteComment, likeComment } =
-    useComment(postId)
+  const { comments, fetchComments } = useComment(postId)
+
+  // newComment 상태는 features에서 관리
+  const [newComment, setNewComment] = useState<NewComment>({ body: "", postId: null, userId: 1 })
 
   // UI 상태는 feature에서 관리
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
+
+  // Mutations
+  const addCommentMutation = useAddCommentMutation(() => {
+    setNewComment({ body: "", postId: null, userId: 1 })
+  })
+  const updateCommentMutation = useUpdateCommentMutation()
+  const deleteCommentMutation = useDeleteCommentMutation()
+  const likeCommentMutation = useLikeCommentMutation()
 
   const handleAddComment = () => {
     if (!postId) return
@@ -28,22 +45,24 @@ export const useCommentList = (postId: number | undefined) => {
 
   const handleUpdateComment = async () => {
     if (!selectedComment) return
-    await updateComment(selectedComment)
+    await updateCommentMutation.mutateAsync(selectedComment)
     setSelectedComment(null)
     setShowEditCommentDialog(false)
   }
 
   const handleAddCommentSubmit = async () => {
-    await addComment()
+    await addCommentMutation.mutateAsync(newComment)
     setShowAddCommentDialog(false)
   }
 
   const handleLikeComment = (id: number, pId: number) => {
-    likeComment(id, pId)
+    const comment = comments.find((c) => c.id === id)
+    if (!comment) return
+    likeCommentMutation.mutate({ id, updatedComment: comment, postId: pId })
   }
 
   const handleDeleteComment = (id: number, pId: number) => {
-    deleteComment(id, pId)
+    deleteCommentMutation.mutate({ id, postId: pId })
   }
 
   return {

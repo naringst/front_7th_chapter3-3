@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { commentKeys } from "./commentKeys"
-import { likeCommentAPI } from "./likeComment"
-import { postComments } from "./postComments"
-import { deleteCommentAPI } from "./deleteComment"
-import { putComment } from "./putComment"
-import { Comment } from "../model/commentTypes"
+import { commentKeys } from "../../../entities/comment/api/commentKeys"
+import { likeCommentAPI } from "../../../entities/comment/api/likeComment"
+import { postComments } from "../../../entities/comment/api/postComments"
+import { deleteCommentAPI } from "../../../entities/comment/api/deleteComment"
+import { putComment } from "../../../entities/comment/api/putComment"
+import { Comment } from "../../../entities/comment/model/commentTypes"
 
 export const useAddCommentMutation = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient()
