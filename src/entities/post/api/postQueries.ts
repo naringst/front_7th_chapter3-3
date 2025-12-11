@@ -3,6 +3,7 @@ import { postKeys } from "./postKeys"
 import { userKeys } from "../../user/api/userKeys"
 import { Post } from "../model/postTypes"
 import { User } from "../../user/model/userTypes"
+import { API_BASE_URL } from "../../../shared/config/api"
 
 interface PostsResponse {
   posts: Post[]
@@ -27,8 +28,8 @@ export const postsQueryOptions = (filters: { limit: number; skip: number }) =>
     queryKey: postKeys.list(filters),
     queryFn: async () => {
       const [postsRes, usersRes] = await Promise.all([
-        fetch(`/api/posts?limit=${filters.limit}&skip=${filters.skip}`),
-        fetch("/api/users?limit=0&select=username,image"),
+        fetch(`${API_BASE_URL}/posts?limit=${filters.limit}&skip=${filters.skip}`),
+        fetch(`${API_BASE_URL}/users?limit=0&select=username,image`),
       ])
       const postsData: PostsResponse = await postsRes.json()
       const usersData: UsersResponse = await usersRes.json()
@@ -46,8 +47,8 @@ export const postsByTagQueryOptions = (tag: string) =>
     queryKey: postKeys.byTag(tag),
     queryFn: async () => {
       const [postsRes, usersRes] = await Promise.all([
-        fetch(`/api/posts/tag/${tag}`),
-        fetch("/api/users?limit=0&select=username,image"),
+        fetch(`${API_BASE_URL}/posts/tag/${tag}`),
+        fetch(`${API_BASE_URL}/users?limit=0&select=username,image`),
       ])
       const postsData: PostsResponse = await postsRes.json()
       const usersData: UsersResponse = await usersRes.json()
@@ -65,7 +66,7 @@ export const searchPostsQueryOptions = (q: string) =>
   queryOptions({
     queryKey: postKeys.search(q),
     queryFn: async () => {
-      const response = await fetch(`/api/posts/search?q=${q}`)
+      const response = await fetch(`${API_BASE_URL}/posts/search?q=${q}`)
       const data: PostsResponse = await response.json()
       return data
     },
@@ -77,7 +78,7 @@ export const usersQueryOptions = () =>
   queryOptions({
     queryKey: userKeys.list(),
     queryFn: async () => {
-      const response = await fetch("/api/users?limit=0&select=username,image")
+      const response = await fetch(`${API_BASE_URL}/users?limit=0&select=username,image`)
       const data: UsersResponse = await response.json()
       return data.users
     },

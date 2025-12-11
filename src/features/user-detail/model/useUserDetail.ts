@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { User, UserDetail } from "../../../entities/user/model/userTypes"
+import { API_BASE_URL } from "../../../shared/config/api"
 
 export const useUserDetail = () => {
   const [showDialog, setShowDialog] = useState(false)
@@ -7,7 +8,7 @@ export const useUserDetail = () => {
 
   const open = async (user: User) => {
     try {
-      const response = await fetch(`/api/users/${user.id}`)
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}`)
       const userData = await response.json()
       setSelectedUser(userData)
       setShowDialog(true)

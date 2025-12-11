@@ -25,10 +25,10 @@ export const PostDetailDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>{highlightText(post?.title, searchQuery)}</DialogTitle>
+          <DialogTitle>{highlightText(post?.title || "", searchQuery)}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <p>{highlightText(post?.body, searchQuery)}</p>
+          <p>{highlightText(post?.body || "", searchQuery)}</p>
           <CommentList postId={post?.id} searchQuery={searchQuery} />
         </div>
       </DialogContent>

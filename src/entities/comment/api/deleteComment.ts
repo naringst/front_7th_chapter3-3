@@ -1,5 +1,7 @@
+import { API_BASE_URL } from "../../../shared/config/api"
+
 export const deleteCommentAPI = async (id: number) => {
-  await fetch(`/api/comments/${id}`, {
+  await fetch(`${API_BASE_URL}/comments/${id}`, {
     method: "DELETE",
   })
 }
