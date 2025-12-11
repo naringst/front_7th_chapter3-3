@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Edit2, MessageSquare, Plus, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 import {
   Button,
@@ -6,10 +5,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
   Table,
   TableBody,
   TableCell,
@@ -18,13 +13,13 @@ import {
   TableRow,
 } from "../../../shared/ui"
 import { highlightText } from "../../../shared/ui/highlightText"
-import { User, UserDetail } from "../../../entities/user/model/userTypes"
 
 // Features
 import { usePostAdd, PostAddDialog } from "../../../features/post-add"
 import { usePostEdit, PostEditDialog } from "../../../features/post-edit"
 import { usePostDetail, PostDetailDialog } from "../../../features/post-detail"
 import { usePostList } from "../../../features/post-list"
+import { useUserDetail, UserDetailDialog } from "../../../features/user-detail"
 import {
   TagSelector,
   SearchInput,
@@ -64,22 +59,7 @@ export const PostsManagerPage = () => {
     onDeleteSuccess: removePostFromList,
   })
   const postDetail = usePostDetail()
-
-  // 사용자 모달 상태
-  const [showUserModal, setShowUserModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null)
-
-  // 사용자 모달 열기
-  const openUserModal = async (user: User) => {
-    try {
-      const response = await fetch(`/api/users/${user.id}`)
-      const userData = await response.json()
-      setSelectedUser(userData)
-      setShowUserModal(true)
-    } catch (error) {
-      console.error("사용자 정보 가져오기 오류:", error)
-    }
-  }
+  const userDetail = useUserDetail()
 
   // 게시물 테이블 렌더링
   const renderPostTable = () => (
@@ -123,7 +103,7 @@ export const PostsManagerPage = () => {
             <TableCell>
               <div
                 className="flex items-center space-x-2 cursor-pointer"
-                onClick={() => post.author && openUserModal(post.author)}
+                onClick={() => post.author && userDetail.open(post.author)}
               >
                 <img src={post.author?.image} alt={post.author?.username} className="w-8 h-8 rounded-full" />
                 <span>{post.author?.username}</span>
@@ -221,39 +201,12 @@ export const PostsManagerPage = () => {
         searchQuery={q}
       />
 
-      {/* 사용자 모달 */}
-      <Dialog open={showUserModal} onOpenChange={setShowUserModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>사용자 정보</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <img src={selectedUser?.image} alt={selectedUser?.username} className="w-24 h-24 rounded-full mx-auto" />
-            <h3 className="text-xl font-semibold text-center">{selectedUser?.username}</h3>
-            <div className="space-y-2">
-              <p>
-                <strong>이름:</strong> {selectedUser?.firstName} {selectedUser?.lastName}
-              </p>
-              <p>
-                <strong>나이:</strong> {selectedUser?.age}
-              </p>
-              <p>
-                <strong>이메일:</strong> {selectedUser?.email}
-              </p>
-              <p>
-                <strong>전화번호:</strong> {selectedUser?.phone}
-              </p>
-              <p>
-                <strong>주소:</strong> {selectedUser?.address?.address}, {selectedUser?.address?.city},{" "}
-                {selectedUser?.address?.state}
-              </p>
-              <p>
-                <strong>직장:</strong> {selectedUser?.company?.name} - {selectedUser?.company?.title}
-              </p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* 사용자 상세 보기 대화상자 */}
+      <UserDetailDialog
+        open={userDetail.showDialog}
+        onOpenChange={userDetail.setShowDialog}
+        user={userDetail.selectedUser}
+      />
     </Card>
   )
 }
