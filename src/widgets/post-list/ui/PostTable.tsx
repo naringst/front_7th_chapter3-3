@@ -1,7 +1,10 @@
-import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
+import { Edit2, MessageSquare, Trash2 } from "lucide-react"
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../shared/ui"
 import { highlightText } from "../../../shared/ui/highlightText"
 import { Post } from "../../../entities/post/model/postTypes"
+import { TagBadge } from "../../../entities/tag"
+import { UserInfo } from "../../../entities/user"
+import { PostReactions } from "../../../entities/post"
 
 interface PostTableProps {
   posts: Post[]
@@ -45,37 +48,24 @@ export const PostTable = ({
 
                 <div className="flex flex-wrap gap-1">
                   {post.tags?.map((postTag) => (
-                    <span
+                    <TagBadge
                       key={postTag}
-                      className={`px-1 text-[9px] font-semibold rounded-[4px] cursor-pointer ${
-                        tag === postTag
-                          ? "text-white bg-blue-500 hover:bg-blue-600"
-                          : "text-blue-800 bg-blue-100 hover:bg-blue-200"
-                      }`}
-                      onClick={() => onTagChange(postTag)}
-                    >
-                      {postTag}
-                    </span>
+                      tag={postTag}
+                      selected={tag === postTag}
+                      onClick={onTagChange}
+                    />
                   ))}
                 </div>
               </div>
             </TableCell>
             <TableCell>
-              <div
-                className="flex items-center space-x-2 cursor-pointer"
+              <UserInfo
+                user={post.author}
                 onClick={() => post.author && onUserClick(post)}
-              >
-                <img src={post.author?.image} alt={post.author?.username} className="w-8 h-8 rounded-full" />
-                <span>{post.author?.username}</span>
-              </div>
+              />
             </TableCell>
             <TableCell>
-              <div className="flex items-center gap-2">
-                <ThumbsUp className="w-4 h-4" />
-                <span>{post.reactions?.likes || 0}</span>
-                <ThumbsDown className="w-4 h-4" />
-                <span>{post.reactions?.dislikes || 0}</span>
-              </div>
+              <PostReactions reactions={post.reactions} />
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
