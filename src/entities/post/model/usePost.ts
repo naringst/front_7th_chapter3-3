@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { postsQueryOptions, postsByTagQueryOptions, searchPostsQueryOptions } from "../api/postQueries"
-import { postKeys } from "../../../shared/api/queryKeys"
+import { postKeys } from "../api/postKeys"
 import { Post } from "./postTypes"
 
 /**

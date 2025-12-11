@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query"
-import { tagKeys } from "../../../shared/api/queryKeys"
+import { tagKeys } from "./tagKeys"
 import { Tag } from "../model/tagType"
 
 export const tagsQueryOptions = () =>

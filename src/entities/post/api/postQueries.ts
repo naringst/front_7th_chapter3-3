@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query"
-import { postKeys, userKeys } from "../../../shared/api/queryKeys"
+import { postKeys } from "./postKeys"
+import { userKeys } from "../../user/api/userKeys"
 import { Post } from "../model/postTypes"
 import { User } from "../../user/model/userTypes"
 

@@ -1,15 +1,15 @@
 import { useState } from "react"
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { commentsByPostQueryOptions } from "../api/commentQueries"
-import { commentKeys } from "../../../shared/api/queryKeys"
-import { likeCommentAPI } from "../api/likeComment"
-import { postComments } from "../api/postComments"
-import { deleteCommentAPI } from "../api/deleteComment"
-import { putComment } from "../api/putComment"
+import {
+  useAddCommentMutation,
+  useUpdateCommentMutation,
+  useDeleteCommentMutation,
+  useLikeCommentMutation,
+} from "../api/commentMutations"
 import { NewComment, Comment } from "./commentTypes"
 
 export const useComment = (postId?: number) => {
-  const queryClient = useQueryClient()
   const [newComment, setNewComment] = useState<NewComment>({ body: "", postId: null, userId: 1 })
 
   // 댓글 조회
@@ -18,50 +18,13 @@ export const useComment = (postId?: number) => {
     enabled: !!postId,
   })
 
-  // 댓글 추가 mutation
-  const addCommentMutation = useMutation({
-    mutationFn: postComments,
-    onSuccess: (data) => {
-      queryClient.setQueryData(commentKeys.byPost(data.postId), (old: Comment[] | undefined) => {
-        return [...(old || []), data]
-      })
-      setNewComment({ body: "", postId: null, userId: 1 })
-    },
+  // Mutations
+  const addCommentMutation = useAddCommentMutation(() => {
+    setNewComment({ body: "", postId: null, userId: 1 })
   })
-
-  // 댓글 수정 mutation
-  const updateCommentMutation = useMutation({
-    mutationFn: putComment,
-    onSuccess: (data) => {
-      queryClient.setQueryData(commentKeys.byPost(data.postId), (old: Comment[] | undefined) => {
-        if (!old) return old
-        return old.map((comment) => (comment.id === data.id ? data : comment))
-      })
-    },
-  })
-
-  // 댓글 삭제 mutation
-  const deleteCommentMutation = useMutation({
-    mutationFn: ({ id }: { id: number; postId: number }) => deleteCommentAPI(id),
-    onSuccess: (_, { id, postId: pId }) => {
-      queryClient.setQueryData(commentKeys.byPost(pId), (old: Comment[] | undefined) => {
-        if (!old) return old
-        return old.filter((comment) => comment.id !== id)
-      })
-    },
-  })
-
-  // 댓글 좋아요 mutation
-  const likeCommentMutation = useMutation({
-    mutationFn: ({ id, updatedComment }: { id: number; updatedComment: Comment; postId: number }) =>
-      likeCommentAPI(id, updatedComment),
-    onSuccess: (data, { postId: pId }) => {
-      queryClient.setQueryData(commentKeys.byPost(pId), (old: Comment[] | undefined) => {
-        if (!old) return old
-        return old.map((comment) => (comment.id === data.id ? { ...data, likes: comment.likes + 1 } : comment))
-      })
-    },
-  })
+  const updateCommentMutation = useUpdateCommentMutation()
+  const deleteCommentMutation = useDeleteCommentMutation()
+  const likeCommentMutation = useLikeCommentMutation()
 
   const addComment = () => {
     addCommentMutation.mutate(newComment)

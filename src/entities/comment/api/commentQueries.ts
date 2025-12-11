@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query"
-import { commentKeys } from "../../../shared/api/queryKeys"
+import { commentKeys } from "./commentKeys"
 import { Comment } from "../model/commentTypes"
 
 interface CommentsResponse {
