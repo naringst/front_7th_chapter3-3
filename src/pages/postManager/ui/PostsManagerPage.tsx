@@ -1,36 +1,19 @@
 import { Plus } from "lucide-react"
+import { useSearchParams } from "react-router-dom"
 import { Button, Card, CardHeader, CardTitle } from "../../../shared/ui"
 
 // Features
 import { usePostAdd, PostAddDialog } from "../../../features/post-add"
 import { usePostEdit, PostEditDialog } from "../../../features/post-edit"
 import { usePostDetail, PostDetailDialog } from "../../../features/post-detail"
-import { usePostList } from "../../../features/post-list"
 import { useUserDetail, UserDetailDialog } from "../../../features/user-detail"
 
 // Widgets
 import { PostListWidget } from "../../../widgets/post-list"
 
 export const PostsManagerPage = () => {
-  // Post 목록 (필터 + 데이터)
-  const {
-    q,
-    skip,
-    limit,
-    sortBy,
-    sortOrder,
-    tag,
-    setQ,
-    setSkip,
-    setLimit,
-    setSortBy,
-    setSortOrder,
-    setTag,
-    loading,
-    posts,
-    total,
-    searchPosts,
-  } = usePostList()
+  const [searchParams] = useSearchParams()
+  const searchQuery = searchParams.get("search")
 
   // Features
   const postAdd = usePostAdd()
@@ -51,22 +34,6 @@ export const PostsManagerPage = () => {
       </CardHeader>
 
       <PostListWidget
-        q={q || ""}
-        tag={tag || ""}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
-        skip={skip}
-        limit={limit}
-        total={total}
-        loading={loading}
-        posts={posts}
-        onQChange={setQ}
-        onTagChange={setTag}
-        onSortByChange={setSortBy}
-        onSortOrderChange={setSortOrder}
-        onSkipChange={setSkip}
-        onLimitChange={setLimit}
-        onSearch={() => searchPosts({ q: q || "" })}
         onPostDetail={postDetail.open}
         onPostEdit={postEdit.open}
         onPostDelete={postEdit.remove}
@@ -96,7 +63,7 @@ export const PostsManagerPage = () => {
         open={postDetail.showDialog}
         onOpenChange={postDetail.setShowDialog}
         post={postDetail.selectedPost}
-        searchQuery={q}
+        searchQuery={searchQuery || undefined}
       />
 
       {/* 사용자 상세 보기 대화상자 */}

@@ -30,6 +30,6 @@ export const usePost = ({ limit, skip, tag, searchQuery }: { limit: number; skip
   return {
     posts: activeQuery.data?.posts || [],
     total: activeQuery.data?.total || 0,
-    loading: activeQuery.isLoading,
+    isLoading: activeQuery.isLoading,
   }
 }
