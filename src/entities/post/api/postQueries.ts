@@ -42,12 +42,12 @@ export const postsQueryOptions = (filters: { limit: number; skip: number }) =>
   })
 
 // 태그별 posts 가져오기
-export const postsByTagQueryOptions = (tag: string) =>
+export const postsByTagQueryOptions = (tag: string, filters: { limit: number; skip: number }) =>
   queryOptions({
-    queryKey: postKeys.byTag(tag),
+    queryKey: postKeys.byTag(tag, filters),
     queryFn: async () => {
       const [postsRes, usersRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/posts/tag/${tag}`),
+        fetch(`${API_BASE_URL}/posts/tag/${tag}?limit=${filters.limit}&skip=${filters.skip}`),
         fetch(`${API_BASE_URL}/users?limit=0&select=username,image`),
       ])
       const postsData: PostsResponse = await postsRes.json()
@@ -62,13 +62,21 @@ export const postsByTagQueryOptions = (tag: string) =>
   })
 
 // 검색
-export const searchPostsQueryOptions = (q: string) =>
+export const searchPostsQueryOptions = (q: string, filters: { limit: number; skip: number }) =>
   queryOptions({
-    queryKey: postKeys.search(q),
+    queryKey: postKeys.search(q, filters),
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/posts/search?q=${q}`)
-      const data: PostsResponse = await response.json()
-      return data
+      const [postsRes, usersRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/posts/search?q=${q}&limit=${filters.limit}&skip=${filters.skip}`),
+        fetch(`${API_BASE_URL}/users?limit=0&select=username,image`),
+      ])
+      const postsData: PostsResponse = await postsRes.json()
+      const usersData: UsersResponse = await usersRes.json()
+
+      return {
+        posts: mergePostsWithUsers(postsData.posts, usersData.users),
+        total: postsData.total,
+      }
     },
     enabled: !!q,
   })

@@ -28,13 +28,13 @@ export const usePost = ({ limit, skip, tag, searchQuery, sortBy = "none", sortOr
 
   // 태그별 posts 쿼리
   const tagQuery = useQuery({
-    ...postsByTagQueryOptions(tag || ""),
+    ...postsByTagQueryOptions(tag || "", { limit, skip }),
     enabled: !!tag && !searchQuery,
   })
 
   // 검색 쿼리
   const searchQuery_ = useQuery({
-    ...searchPostsQueryOptions(searchQuery || ""),
+    ...searchPostsQueryOptions(searchQuery || "", { limit, skip }),
     enabled: !!searchQuery,
   })
 
