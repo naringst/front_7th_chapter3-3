@@ -25,6 +25,8 @@ export const PostListWidget = ({ onPostDetail, onPostEdit, onPostDelete, onUserC
     skip,
     tag: tag || undefined,
     searchQuery: search || undefined,
+    sortBy,
+    sortOrder,
   })
 
   // 검색 입력은 로컬 state로 관리, 엔터 시에만 URL에 반영
