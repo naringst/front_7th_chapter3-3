@@ -18,7 +18,7 @@ export function usePostFilters() {
 
   return {
     ...filters,
-    setQ: (q: string) => update({ q }),
+    setSearch: (search: string) => update({ search }),
     setTag: (tag: string) => update({ tag }),
     setSortBy: (sortBy: "none" | "id" | "title" | "reactions") => update({ sortBy }),
     setSortOrder: (sortOrder: "asc" | "desc") => update({ sortOrder }),

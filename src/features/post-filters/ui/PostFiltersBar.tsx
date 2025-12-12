@@ -7,11 +7,11 @@ type SortBy = "none" | "id" | "title" | "reactions"
 type SortOrder = "asc" | "desc"
 
 interface PostFiltersBarProps {
-  q: string
+  searchInput: string
   tag: string
   sortBy: SortBy
   sortOrder: SortOrder
-  onQChange: (value: string) => void
+  onSearchInputChange: (value: string) => void
   onTagChange: (value: string) => void
   onSortByChange: (value: SortBy) => void
   onSortOrderChange: (value: SortOrder) => void
@@ -19,11 +19,11 @@ interface PostFiltersBarProps {
 }
 
 export const PostFiltersBar = ({
-  q,
+  searchInput,
   tag,
   sortBy,
   sortOrder,
-  onQChange,
+  onSearchInputChange,
   onTagChange,
   onSortByChange,
   onSortOrderChange,
@@ -31,7 +31,7 @@ export const PostFiltersBar = ({
 }: PostFiltersBarProps) => {
   return (
     <div className="flex gap-4">
-      <SearchInput value={q} onChange={onQChange} onSearch={onSearch} />
+      <SearchInput value={searchInput} onChange={onSearchInputChange} onSearch={onSearch} />
       <TagSelector value={tag} onChange={onTagChange} />
       <SortBySelector value={sortBy} onChange={onSortByChange} />
       <SortOrderSelector value={sortOrder} onChange={onSortOrderChange} />

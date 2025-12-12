@@ -14,7 +14,7 @@ describe("usePostFilters", () => {
     it("returns default filter values", () => {
       const { result } = renderHook(() => usePostFilters(), { wrapper })
 
-      expect(result.current.q).toBeUndefined()
+      expect(result.current.search).toBeUndefined()
       expect(result.current.tag).toBeUndefined()
       expect(result.current.sortBy).toBe("none")
       expect(result.current.sortOrder).toBe("asc")
@@ -23,11 +23,11 @@ describe("usePostFilters", () => {
     })
 
     it("parses URL params correctly", () => {
-      window.history.pushState({}, "", "/?q=test&tag=history&sortBy=id&sortOrder=desc&skip=10&limit=20")
+      window.history.pushState({}, "", "/?search=test&tag=history&sortBy=id&sortOrder=desc&skip=10&limit=20")
 
       const { result } = renderHook(() => usePostFilters(), { wrapper })
 
-      expect(result.current.q).toBe("test")
+      expect(result.current.search).toBe("test")
       expect(result.current.tag).toBe("history")
       expect(result.current.sortBy).toBe("id")
       expect(result.current.sortOrder).toBe("desc")
@@ -41,10 +41,10 @@ describe("usePostFilters", () => {
       const { result } = renderHook(() => usePostFilters(), { wrapper })
 
       act(() => {
-        result.current.setQ("search term")
+        result.current.setSearch("search term")
       })
 
-      expect(result.current.q).toBe("search term")
+      expect(result.current.search).toBe("search term")
     })
 
     it("updates tag filter", () => {
@@ -104,19 +104,19 @@ describe("usePostFilters", () => {
 
       act(() => {
         result.current.update({
-          q: "multi",
+          search: "multi",
           tag: "test",
           sortBy: "reactions",
         })
       })
 
-      expect(result.current.q).toBe("multi")
+      expect(result.current.search).toBe("multi")
       expect(result.current.tag).toBe("test")
       expect(result.current.sortBy).toBe("reactions")
     })
 
     it("preserves existing filters when updating", () => {
-      window.history.pushState({}, "", "/?q=existing")
+      window.history.pushState({}, "", "/?search=existing")
 
       const { result } = renderHook(() => usePostFilters(), { wrapper })
 
@@ -124,7 +124,7 @@ describe("usePostFilters", () => {
         result.current.setTag("newTag")
       })
 
-      expect(result.current.q).toBe("existing")
+      expect(result.current.search).toBe("existing")
       expect(result.current.tag).toBe("newTag")
     })
   })
@@ -134,10 +134,10 @@ describe("usePostFilters", () => {
       const { result } = renderHook(() => usePostFilters(), { wrapper })
 
       act(() => {
-        result.current.setQ("urltest")
+        result.current.setSearch("urltest")
       })
 
-      expect(window.location.search).toContain("q=urltest")
+      expect(window.location.search).toContain("search=urltest")
     })
 
     it("removes default values from URL", () => {

@@ -17,17 +17,17 @@ describe("parseFilters", () => {
       const params = new URLSearchParams()
       const result = parseFilters(params)
 
-      expect(result.q).toBeUndefined()
+      expect(result.search).toBeUndefined()
       expect(result.tag).toBeUndefined()
     })
   })
 
   describe("Parsing String Fields", () => {
-    it("parses q parameter", () => {
-      const params = new URLSearchParams("q=searchterm")
+    it("parses search parameter", () => {
+      const params = new URLSearchParams("search=searchterm")
       const result = parseFilters(params)
 
-      expect(result.q).toBe("searchterm")
+      expect(result.search).toBe("searchterm")
     })
 
     it("parses tag parameter", () => {
@@ -77,10 +77,10 @@ describe("parseFilters", () => {
 
   describe("Complex Scenarios", () => {
     it("parses all parameters together", () => {
-      const params = new URLSearchParams("q=test&tag=history&sortBy=id&sortOrder=desc&skip=10&limit=20")
+      const params = new URLSearchParams("search=test&tag=history&sortBy=id&sortOrder=desc&skip=10&limit=20")
       const result = parseFilters(params)
 
-      expect(result.q).toBe("test")
+      expect(result.search).toBe("test")
       expect(result.tag).toBe("history")
       expect(result.sortBy).toBe("id")
       expect(result.sortOrder).toBe("desc")

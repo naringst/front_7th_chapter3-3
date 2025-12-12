@@ -8,7 +8,7 @@ import { PostReactions } from "../../../entities/post"
 
 interface PostTableProps {
   posts: Post[]
-  q: string
+  searchQuery: string
   tag: string
   onTagChange: (value: string) => void
   onPostDetail: (post: Post) => void
@@ -19,7 +19,7 @@ interface PostTableProps {
 
 export const PostTable = ({
   posts,
-  q,
+  searchQuery,
   tag,
   onTagChange,
   onPostDetail,
@@ -44,7 +44,7 @@ export const PostTable = ({
             <TableCell>{post.id}</TableCell>
             <TableCell>
               <div className="space-y-1">
-                <div>{highlightText(post.title, q)}</div>
+                <div>{highlightText(post.title, searchQuery)}</div>
 
                 <div className="flex flex-wrap gap-1">
                   {post.tags?.map((postTag) => (

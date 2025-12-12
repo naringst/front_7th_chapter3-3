@@ -104,9 +104,9 @@ describe("buildSearchParams", () => {
   })
 
   describe("Optional String Fields", () => {
-    it("includes q when provided", () => {
+    it("includes search when provided", () => {
       const filters: PostFilters = {
-        q: "searchterm",
+        search: "searchterm",
         sortBy: "none",
         sortOrder: "asc",
         skip: 0,
@@ -114,7 +114,7 @@ describe("buildSearchParams", () => {
       }
       const result = buildSearchParams(filters)
 
-      expect(result.get("q")).toBe("searchterm")
+      expect(result.get("search")).toBe("searchterm")
     })
 
     it("includes tag when provided", () => {
@@ -130,7 +130,7 @@ describe("buildSearchParams", () => {
       expect(result.get("tag")).toBe("history")
     })
 
-    it("excludes q when undefined", () => {
+    it("excludes search when undefined", () => {
       const filters: PostFilters = {
         sortBy: "none",
         sortOrder: "asc",
@@ -139,12 +139,12 @@ describe("buildSearchParams", () => {
       }
       const result = buildSearchParams(filters)
 
-      expect(result.has("q")).toBe(false)
+      expect(result.has("search")).toBe(false)
     })
 
     it("excludes empty string values", () => {
       const filters: PostFilters = {
-        q: "",
+        search: "",
         sortBy: "none",
         sortOrder: "asc",
         skip: 0,
@@ -152,14 +152,14 @@ describe("buildSearchParams", () => {
       }
       const result = buildSearchParams(filters)
 
-      expect(result.has("q")).toBe(false)
+      expect(result.has("search")).toBe(false)
     })
   })
 
   describe("Complex Scenarios", () => {
     it("builds params with multiple non-default values", () => {
       const filters: PostFilters = {
-        q: "test",
+        search: "test",
         tag: "history",
         sortBy: "title",
         sortOrder: "desc",
@@ -168,7 +168,7 @@ describe("buildSearchParams", () => {
       }
       const result = buildSearchParams(filters)
 
-      expect(result.get("q")).toBe("test")
+      expect(result.get("search")).toBe("test")
       expect(result.get("tag")).toBe("history")
       expect(result.get("sortBy")).toBe("title")
       expect(result.get("sortOrder")).toBe("desc")
