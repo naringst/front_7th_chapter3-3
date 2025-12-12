@@ -17,24 +17,18 @@ interface PostListWidgetProps {
   onUserClick: (post: Post) => void
 }
 
-export const PostListWidget = ({
-  onPostDetail,
-  onPostEdit,
-  onPostDelete,
-  onUserClick,
-}: PostListWidgetProps) => {
+export const PostListWidget = ({ onPostDetail, onPostEdit, onPostDelete, onUserClick }: PostListWidgetProps) => {
   const { search, skip, limit, sortBy, sortOrder, tag, setSearch, setSkip, setLimit, setSortBy, setSortOrder, setTag } =
     usePostFilters()
-
-  // 검색 입력은 로컬 state로 관리, 엔터 시에만 URL에 반영
-  const [searchInput, setSearchInput] = useState(search || "")
-
   const { posts, total, isLoading } = usePost({
     limit,
     skip,
     tag: tag || undefined,
     searchQuery: search || undefined,
   })
+
+  // 검색 입력은 로컬 state로 관리, 엔터 시에만 URL에 반영
+  const [searchInput, setSearchInput] = useState(search || "")
 
   const handleSearch = () => {
     setSearch(searchInput)
@@ -73,13 +67,7 @@ export const PostListWidget = ({
         )}
 
         {/* 페이지네이션 */}
-        <Pagination
-          skip={skip}
-          limit={limit}
-          total={total}
-          onSkipChange={setSkip}
-          onLimitChange={setLimit}
-        />
+        <Pagination skip={skip} limit={limit} total={total} onSkipChange={setSkip} onLimitChange={setLimit} />
       </div>
     </CardContent>
   )
