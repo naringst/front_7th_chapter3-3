@@ -1,18 +1,20 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  base: "/front_7th_chapter3-3/",
-  server: {
-    proxy: {
-      "/api": {
-        // target: 'https://jsonplaceholder.typicode.com',
-        target: "https://dummyjson.com",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+export default defineConfig(({ mode }) => {
+  const isDev = mode === "development"
+
+  return {
+    plugins: [react()],
+    base: isDev ? "/" : "/front_7th_chapter3-3/",
+    server: {
+      proxy: {
+        "/api": {
+          target: "https://dummyjson.com",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ""),
+        },
       },
     },
-  },
+  }
 })
