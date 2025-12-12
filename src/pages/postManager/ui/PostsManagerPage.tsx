@@ -1,5 +1,4 @@
 import { Plus } from "lucide-react"
-import { useSearchParams } from "react-router-dom"
 import { Button, Card, CardHeader, CardTitle } from "../../../shared/ui"
 
 // Features
@@ -12,9 +11,6 @@ import { useUserDetail, UserDetailDialog } from "../../../features/user-detail"
 import { PostListWidget } from "../../../widgets/post-list"
 
 export const PostsManagerPage = () => {
-  const [searchParams] = useSearchParams()
-  const searchQuery = searchParams.get("search")
-
   // Features
   const postAdd = usePostAdd()
   const postEdit = usePostEdit()
@@ -63,7 +59,6 @@ export const PostsManagerPage = () => {
         open={postDetail.showDialog}
         onOpenChange={postDetail.setShowDialog}
         post={postDetail.selectedPost}
-        searchQuery={searchQuery || undefined}
       />
 
       {/* 사용자 상세 보기 대화상자 */}

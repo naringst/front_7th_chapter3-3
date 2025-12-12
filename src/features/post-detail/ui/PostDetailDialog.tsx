@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom"
 import {
   Dialog,
   DialogContent,
@@ -12,15 +13,15 @@ interface PostDetailDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   post: Post | null
-  searchQuery?: string
 }
 
 export const PostDetailDialog = ({
   open,
   onOpenChange,
   post,
-  searchQuery = "",
 }: PostDetailDialogProps) => {
+  const [searchParams] = useSearchParams()
+  const searchQuery = searchParams.get("search") || ""
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
