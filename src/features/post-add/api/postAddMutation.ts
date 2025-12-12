@@ -17,11 +17,11 @@ export const useAddPostMutation = (options?: { onSuccess?: (data: Post) => void 
       // 진행 중인 쿼리 취소
       await queryClient.cancelQueries({ queryKey: postKeys.all })
 
-      // 이전 데이터 스냅샷
-      const previousPosts = queryClient.getQueriesData<PostsData>({ queryKey: postKeys.lists() })
+      // 모든 posts 관련 쿼리 스냅샷
+      const previousPosts = queryClient.getQueriesData<PostsData>({ queryKey: postKeys.all })
 
-      // 낙관적 업데이트
-      queryClient.setQueriesData<PostsData>({ queryKey: postKeys.lists() }, (old) => {
+      // 낙관적 업데이트 - 모든 posts 관련 쿼리에 적용
+      queryClient.setQueriesData<PostsData>({ queryKey: postKeys.all }, (old) => {
         if (!old) return old
         const optimisticPost: Post = {
           id: Date.now(), // 임시 ID
@@ -30,6 +30,11 @@ export const useAddPostMutation = (options?: { onSuccess?: (data: Post) => void 
           userId: newPost.userId,
           tags: [],
           reactions: { likes: 0, dislikes: 0 },
+          author: {
+            id: newPost.userId,
+            username: "나",
+            image: "",
+          },
         }
         return { posts: [optimisticPost, ...old.posts], total: old.total + 1 }
       })
@@ -44,12 +49,19 @@ export const useAddPostMutation = (options?: { onSuccess?: (data: Post) => void 
         })
       }
     },
-    onSuccess: (data) => {
+    onSuccess: (data, newPost) => {
+      // 서버 응답으로 임시 ID를 실제 ID로 교체
+      queryClient.setQueriesData<PostsData>({ queryKey: postKeys.all }, (old) => {
+        if (!old) return old
+        return {
+          ...old,
+          posts: old.posts.map((post) =>
+            post.title === newPost.title && post.body === newPost.body ? { ...post, id: data.id } : post
+          ),
+        }
+      })
       options?.onSuccess?.(data)
     },
-    onSettled: () => {
-      // 쿼리 무효화하여 서버 데이터와 동기화
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() })
-    },
+    // dummyjson은 실제 저장하지 않으므로 invalidate하지 않음
   })
 }

@@ -41,7 +41,7 @@ export const PostTable = ({
       <TableBody>
         {posts.map((post) => (
           <TableRow key={post.id}>
-            <TableCell>{post.id}</TableCell>
+            <TableCell>{post.id > 1000000000 ? "NEW" : post.id}</TableCell>
             <TableCell>
               <div className="space-y-1">
                 <div>{highlightText(post.title, searchQuery)}</div>

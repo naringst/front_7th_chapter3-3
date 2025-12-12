@@ -17,10 +17,11 @@ export const useUpdatePostMutation = (options?: { onSuccess?: (data: Post) => vo
     onMutate: async (updatedPost) => {
       await queryClient.cancelQueries({ queryKey: postKeys.all })
 
-      const previousPosts = queryClient.getQueriesData<PostsData>({ queryKey: postKeys.lists() })
+      // 모든 posts 관련 쿼리 스냅샷
+      const previousPosts = queryClient.getQueriesData<PostsData>({ queryKey: postKeys.all })
 
-      // 낙관적 업데이트
-      queryClient.setQueriesData<PostsData>({ queryKey: postKeys.lists() }, (old) => {
+      // 낙관적 업데이트 - 모든 posts 관련 쿼리에 적용
+      queryClient.setQueriesData<PostsData>({ queryKey: postKeys.all }, (old) => {
         if (!old) return old
         return {
           ...old,
@@ -40,9 +41,7 @@ export const useUpdatePostMutation = (options?: { onSuccess?: (data: Post) => vo
     onSuccess: (data) => {
       options?.onSuccess?.(data)
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() })
-    },
+    // dummyjson은 실제 저장하지 않으므로 invalidate하지 않음
   })
 }
 
@@ -54,10 +53,11 @@ export const useDeletePostMutation = (options?: { onSuccess?: (id: number) => vo
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: postKeys.all })
 
-      const previousPosts = queryClient.getQueriesData<PostsData>({ queryKey: postKeys.lists() })
+      // 모든 posts 관련 쿼리 스냅샷
+      const previousPosts = queryClient.getQueriesData<PostsData>({ queryKey: postKeys.all })
 
-      // 낙관적 업데이트
-      queryClient.setQueriesData<PostsData>({ queryKey: postKeys.lists() }, (old) => {
+      // 낙관적 업데이트 - 모든 posts 관련 쿼리에 적용
+      queryClient.setQueriesData<PostsData>({ queryKey: postKeys.all }, (old) => {
         if (!old) return old
         return {
           ...old,
@@ -79,5 +79,6 @@ export const useDeletePostMutation = (options?: { onSuccess?: (id: number) => vo
     onSuccess: (_, id) => {
       options?.onSuccess?.(id)
     },
+    // dummyjson은 실제 저장하지 않으므로 invalidate하지 않음
   })
 }
